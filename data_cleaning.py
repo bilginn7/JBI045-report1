@@ -45,6 +45,21 @@ def compute_stats(data: pd.DataFrame) -> pd.DataFrame:
 
     return stats
 
+def outliers(data: pd.DataFrame) -> pd.DataFrame:
+    """Filter out outliers from stats file.
+
+    :param data: Stats DataFrame output from compute_stats().
+    :return: Outliers removed from the stats DataFrame.
+    """
+    result = data.copy()
+
+    for col in ['annual_return', 'annual_volatility']:
+        Q1 = result[col].quantile(0.25)
+        Q3 = result[col].quantile(0.75)
+        IQR = Q3 - Q1
+        result = result.loc[(result[col] >= Q1 - 1.5 * IQR) & (result[col] <= Q3 + 1.5 * IQR)]
+
+    return result
 
 if __name__ == '__main__':
 
@@ -53,6 +68,8 @@ if __name__ == '__main__':
 
     cleaned_df: pd.DataFrame = clean_data(filepath, year)
     stats_df: pd.DataFrame = compute_stats(cleaned_df)
+    outliers_df: pd.DataFrame = outliers(stats_df)
 
     print(stats_df)
     stats_df.to_csv(f'data/sp500_stats_{year}.csv')
+    outliers_df.to_csv(f'data/sp500_outliers_{year}.csv')
