@@ -1,10 +1,11 @@
+from pathlib import Path
 import pandas as pd
 
 
-def clean_data(filepath: str, year: int) -> pd.DataFrame:
-    """Clean and filter the sp500 stocks dataset by specific year.
+def clean_data(filepath: Path, year: int) -> pd.DataFrame:
+    """Clean and filter the S&P 500 stocks dataset by specific year.
 
-    :param filepath: Path to the sp500 stocks CSV file.
+    :param filepath: Path to the S&P 500 stocks CSV file.
     :param year: Year to filter the data by.
     :return: Cleaned DataFrame with daily returns for the specified year.
     """
@@ -21,17 +22,11 @@ def clean_data(filepath: str, year: int) -> pd.DataFrame:
 
 
 def compute_stats(data: pd.DataFrame) -> pd.DataFrame:
-    """Compute average daily return, volatility, and annualised stats per symbol.
-    Each symbol is annualised using its own number of trading days,
-    making it suitable for stocks with partial year data.
+    """Compute average daily return, volatility, and annualized stats per symbol.
 
-    :param data: Cleaned DataFrame output from clean_data, with a daily_return column.
-    :return: DataFrame indexed by symbol with the following columns:
-        - avg_daily_return: Mean daily return.
-        - volatility: Standard deviation of daily returns.
-        - n_days: Number of trading days available for the symbol.
-        - annual_return: Annualised return (avg_daily_return * n_days).
-        - annual_volatility: Annualised volatility (volatility * sqrt(n_days)).
+    :param data: Cleaned DataFrame output from clean_data(), with a daily_return column.
+    :return: DataFrame indexed by symbol with average return, volatility, n_days,
+        annual return, and annual volatility.
     """
     stats = data.groupby('symbol')['daily_return'].agg(
         avg_daily_return='mean',
@@ -45,11 +40,11 @@ def compute_stats(data: pd.DataFrame) -> pd.DataFrame:
 
     return stats
 
-def outliers(data: pd.DataFrame) -> pd.DataFrame:
-    """Filter out outliers from stats file.
+def remove_outliers(data: pd.DataFrame) -> pd.DataFrame:
+    """Remove outliers from the stats DataFrame using the IQR method.
 
     :param data: Stats DataFrame output from compute_stats().
-    :return: Outliers removed from the stats DataFrame.
+    :return: Stats DataFrame with outliers removed.
     """
     result = data.copy()
 
@@ -62,14 +57,20 @@ def outliers(data: pd.DataFrame) -> pd.DataFrame:
     return result
 
 if __name__ == '__main__':
-
-    filepath: str = 'data/sp500_stocks.csv'
     year: int = 2025
 
-    cleaned_df: pd.DataFrame = clean_data(filepath, year)
+    project_root = Path(__file__).resolve().parents[1]
+    data_dir = project_root / "data"
+
+    input_path = data_dir / "sp500_stocks.csv"
+    stats_path = data_dir / f"sp500_stats_{year}.csv"
+    outliers_removed_path = data_dir / f"sp500_outliers_{year}.csv"
+
+    cleaned_df: pd.DataFrame = clean_data(input_path, year)
     stats_df: pd.DataFrame = compute_stats(cleaned_df)
-    outliers_df: pd.DataFrame = outliers(stats_df)
+    outliers_removed_df: pd.DataFrame = remove_outliers(stats_df)
 
     print(stats_df)
-    stats_df.to_csv(f'data/sp500_stats_{year}.csv')
-    outliers_df.to_csv(f'data/sp500_outliers_{year}.csv')
+
+    stats_df.to_csv(stats_path)
+    outliers_removed_df.to_csv(outliers_removed_path)
