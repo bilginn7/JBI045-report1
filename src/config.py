@@ -1,0 +1,9 @@
+K_VALUES = [3, 5, 8]
+
+N_RUNS = 30
+
+RANDOM_SEED = 42
+
+MAX_ITER = 300
+
+TOL = 0.0
