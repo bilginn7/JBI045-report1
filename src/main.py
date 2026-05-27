@@ -9,6 +9,10 @@ from src.experiment import run_experiments
 from src.metrics import summarize_results
 
 from src.visualizations import (
+    plot_iterations,
+    plot_runtime,
+    plot_full_vs_clean,
+    plot_inertia_distribution,
     plot_inertia,
     plot_silhouette,
 )
@@ -116,6 +120,39 @@ def main():
     plot_silhouette(
         clean_summary,
         figs_dir / "silhouette" / "clean_silhouette.png",
+    )
+    plot_iterations(
+        full_summary,
+        figs_dir / "iterations" / "full_iterations.png",
+    )
+
+    plot_iterations(
+        clean_summary,
+        figs_dir / "iterations" / "clean_iterations.png",
+    )
+    plot_runtime(
+        full_summary,
+        figs_dir / "runtime" / "full_runtime.png",
+    )
+
+    plot_runtime(
+        clean_summary,
+        figs_dir / "runtime" / "clean_runtime.png",
+    )
+    plot_full_vs_clean(
+        full_summary,
+        clean_summary,
+        "inertia_mean",
+        "Inertia",
+        figs_dir / "comparison" / "full_vs_clean_inertia.png",
+    )
+
+    plot_full_vs_clean(
+        full_summary,
+        clean_summary,
+        "silhouette_mean",
+        "Silhouette",
+        figs_dir / "comparison" / "full_vs_clean_silhouette.png",
     )
 
     print("Finished.")
