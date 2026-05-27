@@ -141,13 +141,6 @@ The report shows:
 
 ---
 
-# Authors
-
-- [Bilgin Eren](https://www.github.com/bilginn7)
-- [Jan Galic](https://www.github.com/jang1411)
-
----
-
 # References
 
 DarkMatterNet. *S&P 500 Stocks: 25 Years of Data (Updated Daily)*. Kaggle, 2024.
